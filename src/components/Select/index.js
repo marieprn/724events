@@ -15,11 +15,13 @@ const Select = ({
 }) => {
   const [value, setValue] = useState();
   const [collapsed, setCollapsed] = useState(true);
+
   const changeValue = (newValue) => {
-    onChange();
-    setValue(newValue);
-    setCollapsed(newValue);
+    setValue(newValue);       // mise à jour locale
+    setCollapsed(true);       // refermer le menu
+    onChange(newValue);       // prévenir le parent
   };
+
   return (
     <div className={`SelectContainer ${type}`} data-testid="select-testid">
       {label && <div className="label">{label}</div>}
@@ -28,26 +30,17 @@ const Select = ({
           <li className={collapsed ? "SelectTitle--show" : "SelectTitle--hide"}>
             {value || (!titleEmpty && "Toutes")}
           </li>
-          {!collapsed && (
-            <>
-              {!titleEmpty && (
-                <li onClick={() => changeValue(null)}>
-                  <input defaultChecked={!value} name="selected" type="radio" />{" "}
-                  Toutes
-                </li>
-              )}
-              {selection.map((s) => (
-                <li key={s} onClick={() => changeValue(s)}>
-                  <input
-                    defaultChecked={value === s}
-                    name="selected"
-                    type="radio"
-                  />{" "}
-                  {s}
-                </li>
-              ))}
-            </>
+          {!collapsed && !titleEmpty && (
+            <li onClick={() => changeValue(null)}>
+              <input defaultChecked={!value} name="selected" type="radio" /> Toutes
+            </li>
           )}
+          {!collapsed &&
+            selection.map((s) => (
+              <li key={s} onClick={() => changeValue(s)}>
+                <input defaultChecked={value === s} name="selected" type="radio" /> {s}
+              </li>
+            ))}
         </ul>
         <input type="hidden" value={value || ""} name={name} />
         <button
@@ -88,7 +81,7 @@ Select.propTypes = {
   titleEmpty: PropTypes.bool,
   label: PropTypes.string,
   type: PropTypes.string,
-}
+};
 
 Select.defaultProps = {
   onChange: () => null,
@@ -96,6 +89,6 @@ Select.defaultProps = {
   label: "",
   type: "normal",
   name: "select",
-}
+};
 
 export default Select;
