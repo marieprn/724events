@@ -21,7 +21,7 @@
     "test": "react-scripts test",
     "lint": "eslint .eslintrc.js ./src",
     "format": "prettier ./src --write",
-    "predeploy": "yarn build",
+    "predeploy": "react-scripts build",
     "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
