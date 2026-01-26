@@ -4,19 +4,23 @@ import Field, { FIELD_TYPES } from "../../components/Field";
 import Select from "../../components/Select";
 import Button, { BUTTON_TYPES } from "../../components/Button";
 
-const mockContactApi = () => new Promise((resolve) => { setTimeout(resolve, 500); })
+const mockContactApi = () => new Promise((resolve) => { setTimeout(resolve, 500); });
 
 const Form = ({ onSuccess, onError }) => {
   const [sending, setSending] = useState(false);
+  const [formKey, setFormKey] = useState(0); // ✅ ajout
+
   const sendContact = useCallback(
     async (evt) => {
       evt.preventDefault();
       setSending(true);
-      // We try to call mockContactApi
+
       try {
         await mockContactApi();
         setSending(false);
-        onSuccess(); // manquant
+
+        setFormKey((k) => k + 1);
+        onSuccess();
       } catch (err) {
         setSending(false);
         onError(err);
@@ -24,8 +28,9 @@ const Form = ({ onSuccess, onError }) => {
     },
     [onSuccess, onError]
   );
+
   return (
-    <form onSubmit={sendContact}>
+    <form key={formKey} onSubmit={sendContact}>
       <div className="row">
         <div className="col">
           <Field placeholder="" label="Nom" />
@@ -43,11 +48,7 @@ const Form = ({ onSuccess, onError }) => {
           </Button>
         </div>
         <div className="col">
-          <Field
-            placeholder="message"
-            label="Message"
-            type={FIELD_TYPES.TEXTAREA}
-          />
+          <Field placeholder="message" label="Message" type={FIELD_TYPES.TEXTAREA} />
         </div>
       </div>
     </form>
@@ -57,11 +58,11 @@ const Form = ({ onSuccess, onError }) => {
 Form.propTypes = {
   onError: PropTypes.func,
   onSuccess: PropTypes.func,
-}
+};
 
 Form.defaultProps = {
   onError: () => null,
   onSuccess: () => null,
-}
+};
 
 export default Form;
