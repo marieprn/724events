@@ -2,50 +2,70 @@
 
 .ModalEvent {
   font-family: "Manrope", sans-serif;
-  overflow: hidden;
-  width: 450px;
   position: relative;
-  min-height: 669px;
+  overflow-y: auto;
+
+  width: min(450px, 90vw);
+  max-height: 90vh;
+  min-height: 0;
+
+  margin-bottom: 32px;
+
   &__imageContainer {
     width: 100%;
+    margin-bottom: 100px;
+
     img {
       width: 100%;
+      max-height: 35vh;
+      object-fit: cover;
     }
   }
+
   &__title {
     position: absolute;
-    background-color: $primary;
-    color: white;
+    top: 220px;
     left: 0;
     right: 0;
     margin: auto;
-    width: 334px;
-    top: 280px;
+
+    width: 80%;
+    max-width: 334px;
+
     padding: 16px;
     border-radius: 8px;
+
+    background-color: $primary;
+    color: white;
+
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
     align-items: center;
+    gap: 4px;
+
     &Label {
       font-size: 16px;
       font-weight: 600;
     }
+
     &Periode {
       font-size: 14px;
     }
   }
-  margin-bottom: 32px;
-  &__imageContainer {
-    margin-bottom: 64px;
-  }
+
   &__descriptionContainer {
     text-align: center;
     padding-left: 64px;
     padding-right: 64px;
+
+    h3 {
+      margin-bottom: 8px;
+    }
+
     p {
       font-size: 14px;
     }
+
     div {
       font-size: 16px;
     }
