@@ -8,7 +8,7 @@ const mockContactApi = () => new Promise((resolve) => { setTimeout(resolve, 500)
 
 const Form = ({ onSuccess, onError }) => {
   const [sending, setSending] = useState(false);
-  const [formKey, setFormKey] = useState(0); // ✅ ajout
+  const [formKey, setFormKey] = useState(0); // ajout
 
   const sendContact = useCallback(
     async (evt) => {

@@ -13,7 +13,7 @@ const ModalEvent = ({ event }) => (
       </div>
       <div className="ModalEvent__title">
         <div className="ModalEvent__titleLabel">{event.title}</div>
-        <div className="ModalEvent__titlePeriode"> {/* récupération de la date et non de la période */}
+        <div className="ModalEvent__titlePeriode">
           {event.periode}
         </div>
       </div>
