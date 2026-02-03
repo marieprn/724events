@@ -13,13 +13,13 @@ const Select = ({
   label,
   type = "normal",
 }) => {
-  const [value, setValue] = useState();
+  const [value, setValue] = useState(null);
   const [collapsed, setCollapsed] = useState(true);
 
   const changeValue = (newValue) => {
-    setValue(newValue);       // mise à jour locale
-    setCollapsed(true);       // refermer le menu
-    onChange(newValue);       // prévenir le parent
+    setValue(newValue);
+    setCollapsed(true);
+    onChange(newValue);
   };
 
   return (
@@ -30,26 +30,33 @@ const Select = ({
           <li className={collapsed ? "SelectTitle--show" : "SelectTitle--hide"}>
             {value || (!titleEmpty && "Toutes")}
           </li>
+
           {!collapsed && !titleEmpty && (
             <li onClick={() => changeValue(null)}>
-              <input defaultChecked={!value} name="selected" type="radio" /> Toutes
+              <input checked={value === null} readOnly name="selected" type="radio" />{" "}
+              Toutes
             </li>
           )}
+
           {!collapsed &&
             selection.map((s) => (
               <li key={s} onClick={() => changeValue(s)}>
-                <input defaultChecked={value === s} name="selected" type="radio" /> {s}
+                <input checked={value === s} readOnly name="selected" type="radio" />{" "}
+                {s}
               </li>
             ))}
         </ul>
+
+        {/* ✅ c'est ça qui alimente FormData */}
         <input type="hidden" value={value || ""} name={name} />
+
         <button
           type="button"
           data-testid="collapse-button-testid"
           className={collapsed ? "open" : "close"}
           onClick={(e) => {
             e.preventDefault();
-            setCollapsed(!collapsed);
+            setCollapsed((c) => !c);
           }}
         >
           <Arrow />

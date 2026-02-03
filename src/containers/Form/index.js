@@ -15,6 +15,7 @@ const Form = ({ onSuccess, onError }) => {
   const [sending, setSending] = useState(false);
   const [formKey, setFormKey] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
+  const [touched, setTouched] = useState(false);
 
   const sendContact = useCallback(
     async (evt) => {
@@ -29,16 +30,16 @@ const Form = ({ onSuccess, onError }) => {
       const email = (data.get("email") || "").toString().trim();
       const message = (data.get("message") || "").toString().trim();
 
-      // champs requis
-      if (!lastname || !firstname || !profile || !email || !message) {
+      // ✅ On bloque uniquement si l'utilisateur a commencé à interagir
+      if (touched && (!lastname || !firstname || !profile || !email || !message)) {
         const err = new Error("Veuillez remplir tous les champs.");
         setErrorMsg(err.message);
         onError(err);
         return;
       }
 
-      //  validation email
-      if (!isEmailValid(email)) {
+      // ✅ Validation email seulement si l'utilisateur a interagi et qu'il a saisi un email
+      if (touched && email && !isEmailValid(email)) {
         const err = new Error("Email invalide.");
         setErrorMsg(err.message);
         onError(err);
@@ -60,7 +61,7 @@ const Form = ({ onSuccess, onError }) => {
         onError(err);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError, touched]
   );
 
   return (
@@ -72,7 +73,8 @@ const Form = ({ onSuccess, onError }) => {
 
           <Select
             selection={["Personel", "Entreprise"]}
-            onChange={() => null}
+            // ✅ au minimum, marquer qu'il y a eu interaction
+            onChange={() => setTouched(true)}
             label="Personel / Entreprise"
             type="large"
             titleEmpty
