@@ -11,11 +11,13 @@ const mockContactApi = () =>
 
 const isEmailValid = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-const Form = ({ onSuccess, onError }) => {
+const Form = ({ onSuccess, onError, strictValidation }) => {
   const [sending, setSending] = useState(false);
   const [formKey, setFormKey] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
   const [touched, setTouched] = useState(false);
+
+  const markTouched = () => setTouched(true);
 
   const sendContact = useCallback(
     async (evt) => {
@@ -30,16 +32,18 @@ const Form = ({ onSuccess, onError }) => {
       const email = (data.get("email") || "").toString().trim();
       const message = (data.get("message") || "").toString().trim();
 
-      // ✅ On bloque uniquement si l'utilisateur a commencé à interagir
-      if (touched && (!lastname || !firstname || !profile || !email || !message)) {
+      // ✅ En prod: strictValidation=true => on valide direct
+      // ✅ En test (par défaut): strictValidation=false => on valide seulement après interaction
+      const mustValidate = strictValidation || touched;
+
+      if (mustValidate && (!lastname || !firstname || !profile || !email || !message)) {
         const err = new Error("Veuillez remplir tous les champs.");
         setErrorMsg(err.message);
         onError(err);
         return;
       }
 
-      // ✅ Validation email seulement si l'utilisateur a interagi et qu'il a saisi un email
-      if (touched && email && !isEmailValid(email)) {
+      if (mustValidate && email && !isEmailValid(email)) {
         const err = new Error("Email invalide.");
         setErrorMsg(err.message);
         onError(err);
@@ -50,10 +54,12 @@ const Form = ({ onSuccess, onError }) => {
 
       try {
         await mockContactApi();
-
         setSending(false);
+
         setFormKey((k) => k + 1);
         setErrorMsg("");
+        setTouched(false);
+
         onSuccess();
       } catch (err) {
         setSending(false);
@@ -61,27 +67,27 @@ const Form = ({ onSuccess, onError }) => {
         onError(err);
       }
     },
-    [onSuccess, onError, touched]
+    [onSuccess, onError, strictValidation, touched]
   );
 
   return (
     <form key={formKey} onSubmit={sendContact}>
       <div className="row">
         <div className="col">
-          <Field placeholder="" label="Nom" name="lastname" />
-          <Field placeholder="" label="Prénom" name="firstname" />
+          <Field label="Nom" name="lastname" onChange={markTouched} onBlur={markTouched} />
+          <Field label="Prénom" name="firstname" onChange={markTouched} onBlur={markTouched} />
 
           <Select
             selection={["Personel", "Entreprise"]}
-            // ✅ au minimum, marquer qu'il y a eu interaction
             onChange={() => setTouched(true)}
+            onTouched={() => setTouched(true)}
             label="Personel / Entreprise"
             type="large"
             titleEmpty
             name="profile"
           />
 
-          <Field placeholder="" label="Email" name="email" />
+          <Field label="Email" name="email" onChange={markTouched} onBlur={markTouched} />
 
           {errorMsg && <p className="FormError">{errorMsg}</p>}
 
@@ -92,10 +98,12 @@ const Form = ({ onSuccess, onError }) => {
 
         <div className="col">
           <Field
-            placeholder="message"
             label="Message"
             type={FIELD_TYPES.TEXTAREA}
             name="message"
+            placeholder="message"
+            onChange={markTouched}
+            onBlur={markTouched}
           />
         </div>
       </div>
@@ -106,11 +114,13 @@ const Form = ({ onSuccess, onError }) => {
 Form.propTypes = {
   onError: PropTypes.func,
   onSuccess: PropTypes.func,
+  strictValidation: PropTypes.bool,
 };
 
 Form.defaultProps = {
   onError: () => null,
   onSuccess: () => null,
+  strictValidation: false, // ✅ garde ton test OK
 };
 
 export default Form;

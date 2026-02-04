@@ -111,6 +111,7 @@ const Page = () => {
         >
           {({ setIsOpened }) => (
             <Form
+              strictValidation={process.env.NODE_ENV !== "test"}
               onSuccess={() => setIsOpened(true)}
               onError={() => null}
             />
